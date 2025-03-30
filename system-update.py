@@ -12,6 +12,10 @@ NUS_BASE_URL = "http://nus.shop.wii.com"
 NUS_NET_UPDATE_SOAP_PATH = "/nus/services/NetUpdateSOAP"
 headers = {"Content-Type": "application/xml", "SOAPAction": "urn:nus.wsapi.broadon.com/GetSystemUpdate", "User-Agent": "wii libnup/1.0"}
 
+# Installing boot2 WADs can be very dangerous in some cases so to be safe, they are only downloaded if the user confirms they would like to download it
+BOOT2_TITLE_ID = "0000000100000001"
+SKIP_BOOT2 = True # Enabled by default
+
 # Values for the SOAP Request
 REGION = ""
 DEVICE_ID = "5555555555" # For some reason there seems to be some sort of algorithm with this, but 5555555555 works always so we use it here
@@ -73,7 +77,13 @@ def download_title(title_id: str, version: str):
 # ENTRY
 if len(sys.argv) < 2:
     print("Usage: system-update.py <REGION>")
+    print("You can also add --boot2 in the arguments to download the latest boot2 from NUS as well. However, installing this may be dangerous and this is why it is skipped by default.")
     sys.exit(1)
+
+# Check if they want to continue with downloading boot2, and potentially installing it
+if "--boot2" in sys.argv:
+    confirmation = input("You have specified to download boot2 along with everything else from the System Update. Modifying boot2 is not recommended and often not necessary for many reasons, however if you are SURE you want to do this, type YES: ").strip().lower()
+    SKIP_BOOT2 = confirmation != "yes"
 
 parse_region(sys.argv[1])
 generate_soap_request()
@@ -87,6 +97,8 @@ ns = {'ns': 'urn:nus.wsapi.broadon.com'}
 # parse all the title versions
 for title in root.findall(".//ns:TitleVersion", ns):
     title_id = title.find("ns:TitleId", ns).text
+    if (title_id == BOOT2_TITLE_ID and SKIP_BOOT2):
+        continue
     version = title.find("ns:Version", ns).text
     fs_size = title.find("ns:FsSize", ns).text
     print(f"Downloading Title ID: {title_id}, Version: {version}, Size: {fs_size}")
