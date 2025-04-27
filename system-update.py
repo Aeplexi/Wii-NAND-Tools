@@ -24,12 +24,12 @@ DEVICE_ID = "5555555555" # For some reason there seems to be some sort of algori
 SOAP_REQUEST = ""
 
 def parse_region(region: str):
-    # We want to tell the user that only "USA", "EUR", "JPN", and "KOR" are supported
+    # We want to tell the user that only "USA", "EUR", "JPN", "TWN", and "KOR" are supported
     global REGION
-    if region == "USA" or region == "EUR" or region == "JPN" or region == "KOR": # Probably a better way to handle this line but whatever tbh
+    if region == "USA" or region == "EUR" or region == "JPN" or region == "KOR" or region == "TWN": # Probably a better way to handle this line but whatever tbh
         REGION = region
     else:
-        print("You have entered an invalid region. Valid regions are: USA, EUR, JPN, KOR")
+        print("You have entered an invalid region. Valid regions are: USA, EUR, JPN, KOR, TWN")
         sys.exit(1)
 
 def generate_soap_request():
